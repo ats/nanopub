@@ -114,12 +114,7 @@ function indieAuth($headers)
     /**
      * Check token is valid 
      */
-    //$token = $headers['authorization'];
-    if (isset($_SERVER['REDIRECT_HTTP_AUTHORIZATION'])) {
-	    $token = $_SERVER['REDIRECT_HTTP_AUTHORIZATION']; 
-    } else {
-	    $token = $headers['authorization'];
-    }
+    $token = $headers['authorization'];
     $ch = curl_init("https://tokens.indieauth.com/token");
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
     curl_setopt(
@@ -144,8 +139,7 @@ function indieAuth($headers)
         exit;
     } elseif ($me != $GLOBALS["siteUrl"]) {
         header("HTTP/1.1 401 Unauthorized");
-        echo 'The request lacks valid authentication credentials\n'.$me.'\n'.$GLOBALS["siteUrl"];
-print_r($_SERVER);
+        echo 'The request lacks valid authentication credentials';
         exit;
     } elseif (!in_array('create', $scopes) && !in_array('post', $scopes)) {
         header("HTTP/1.1 403 Forbidden");
@@ -350,7 +344,7 @@ if (isset($_GET['q']) && $_GET['q'] == 'source') {
             $repl = "";
             $srcUri = preg_replace($pattern, $repl, $subj);
             $srcUri = rtrim($srcUri, "/");
-            if ($textFile = file_get_contents("../../../workspace/quickblog/content/$srcUri.md")) {
+            if ($textFile = file_get_contents("../content/$srcUri.md")) {
 
                 //send file for decoding
                 $jsonArray = decode_input($textFile, $mfArray, true);
@@ -397,13 +391,13 @@ if (!empty($data)) {
                 $srcUri = rtrim($srcUri, "/");
                 // First delete if asked to
                 if ($action == "delete") {
-                    rename("../../../workspace/quickblog/content/$srcUri.md", "../trash/$srcUri.md");
+                    rename("../content/$srcUri.md", "../trash/$srcUri.md");
                     header("HTTP/1.1 204 No Content");
                     exit;
                 }
                 // then an undelete
                 if ($action == "undelete") {
-                    rename("../trash/$srcUri.md", "../../../workspace/quickblog/content/$srcUri.md");
+                    rename("../trash/$srcUri.md", "../content/$srcUri.md");
                     header("HTTP/1.1 201 Created");
                     header("Location: ".$siteUrl.$srcUri);
                     exit;
@@ -411,7 +405,7 @@ if (!empty($data)) {
                 // Update can be one of a number of different actions
                 if ($action == "update") {
                     // Updating, so need to read the existing file
-                    if ($textFile = file_get_contents("../../../workspace/quickblog/content/$srcUri.md")) {
+                    if ($textFile = file_get_contents("../content/$srcUri.md")) {
                         //send file for decoding
                         $jsonArray = decode_input($textFile, $mfArray, false);
 
@@ -473,7 +467,7 @@ if (!empty($data)) {
 
                         $content = $jsonArray['content'];
                         unset($jsonArray['content']);
-                        $fn = "../../../workspace/quickblog/content/".$srcUri.".md";
+                        $fn = "../content/".$srcUri.".md";
                         write_file($jsonArray, $content, $fn);
                         header("HTTP/1.1 200 OK");
                         echo json_encode($jsonArray, 128);
@@ -654,26 +648,26 @@ if (!empty($data)) {
             if (!empty($frontmatter['title'])) { 
                 // File locations are specific to my site for now.
                 if (!empty($frontmatter['link'])) {
-                    $fn = "../../../workspace/quickblog/content/link/" . $frontmatter['slug'] . ".md";
+                    $fn = "../content/link/" . $frontmatter['slug'] . ".md";
                     $canonical = $configs->siteUrl . "link/" . $frontmatter['slug'];
                     $synText = $frontmatter['title'];
                 } else {
-                    $fn = "../../../workspace/quickblog/content/post/" . $frontmatter['slug'] . ".md";
-                    $canonical = $configs->siteUrl . "post/" . $frontmatter['slug'];
+                    $fn = "../content/article/" . $frontmatter['slug'] . ".md";
+                    $canonical = $configs->siteUrl . "article/" . $frontmatter['slug'];
                     $synText = $frontmatter['title'];
                 }
             } else { 
                 if (!empty($frontmatter['repost_of'])) {
-                    $fn = "../../../workspace/quickblog/content/like/" . $frontmatter['slug'] . ".md";
+                    $fn = "../content/like/" . $frontmatter['slug'] . ".md";
                     $canonical = $configs->siteUrl . "like/" . $frontmatter['slug'];
                     $synText = $content;
                 } elseif (!empty($frontmatter['like_of'])) {
-                    $fn = "../../../workspace/quickblog/content/like/" . $frontmatter['slug'] . ".md";
+                    $fn = "../content/like/" . $frontmatter['slug'] . ".md";
                     $canonical = $configs->siteUrl . "like/" . $frontmatter['slug'];
                     $synText = $content;
                 } else {
-                    $fn = "../../../workspace/quickblog/content/note/" . $frontmatter['slug'] . ".md";
-                    $canonical = $configs->siteUrl . "note/" . $frontmatter['slug'];
+                    $fn = "../content/micro/" . $frontmatter['slug'] . ".md";
+                    $canonical = $configs->siteUrl . "micro/" . $frontmatter['slug'];
                     $synText = $content;
                 }
             }
@@ -762,13 +756,13 @@ if (!empty($data)) {
             // Some way of triggering Site Generator needs to go in here.
 
             // ping! First one to micro.blog
-            if ($configs->pingMicro) {
-                $feedArray = array ("url" => $siteFeed);
-                post_to_api("https://micro.blog/ping", "null", "$feedArray");
-            }
+            //if ($configs->pingMicro) {
+            //    $feedArray = array ("url" => $siteFeed);
+            //    post_to_api("https://micro.blog/ping", "null", "$feedArray");
+            //}
             // ping! second one to switchboard
-           // $switchArray = array ("hub.mode" => "publish", "hub.url" => $siteUrl);
-           // post_to_api("https://switchboard.p3k.io/", "null", $switchArray);
+            $switchArray = array ("hub.mode" => "publish", "hub.url" => $siteUrl);
+            post_to_api("https://switchboard.p3k.io/", "null", $switchArray);
 
             // ... and Setting headers, return location to client.
             header("HTTP/1.1 201 Created");
