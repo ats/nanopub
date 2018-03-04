@@ -144,7 +144,7 @@ function indieAuth($headers)
         exit;
     } elseif ($me != $GLOBALS["siteUrl"]) {
         header("HTTP/1.1 401 Unauthorized");
-        echo 'The request lacks valid authentication credentials\n'.$me.'\n'.$GLOBALS["siteUrl"];
+echo 'The request lacks valid authentication credentials.';
 print_r($_SERVER);
         exit;
     } elseif (!in_array('create', $scopes) && !in_array('post', $scopes)) {

@@ -1,0 +1,4 @@
+AddType application/x-httpd-php71 .php
+Action application/x-httpd-php71 /fcgi-bin/php71_wrapper.sh
+
+SetEnvIf Authorization "(.*)" HTTP_AUTHORIZATION=$1
