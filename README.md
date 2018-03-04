@@ -39,6 +39,8 @@ Installation
 
 Clone the contents into the `static` folder of your Hugo installation.
 
+Nanopub requires PHP 7.  
+
 Since the 1.2 release, nanopub requires the use of [Composer](https://getcomposer.org/). Getting it to do all the things I wanted it to do was getting _way_ beyond my skill level. 
 
 You'll need to set your site up with the requisite headers to:
@@ -57,6 +59,16 @@ On my site, these headers are provided as follows:
 
 ```
 
+### IndieAuth note
+
+Some hosts may not allow the submission of the HTTP_AUTHORIZATION token that IndieAuth sends in certain situations. If submissions to nanopub fail with 401 errors with a known good token, enable a "redirected" authorization token by adding this line to your nanopub directory's `.htaccess` file:
+
+    SetEnvIf Authorization "(.*)" HTTP_AUTHORIZATION=$1
+
+Nanopub will automatically use this `REDIRECT_HTTP_AUTHORIZATION` token if it is received by your server.
+
+### Configuration
+
 Then you'll have to configure the options in `configs.php`
 
 - Twitter Keys can be obtained using the [Create New App](https://apps.twitter.com/app/new) on twitter.
@@ -65,6 +77,7 @@ Then you'll have to configure the options in `configs.php`
 - If using the micro.blog function, you need to specify your site's rss/atom feed.
 - To use the weather data, you'll need to add access data for a location-tracking endpoint (like a self-hosted version of [Compass](https://github.com/aaronpk/Compass)) and a DarkSky [API Key](https://darksky.net/dev/docs)
 - Since 1.5, you can configure the frontmatter format for your posts. Currently the options are json, used in [Hugo](https://gohugo.io/content-management/front-matter/), or yaml, optionally used in Hugo, but required by other static engines such as [Jekyll](https://jekyllrb.com/docs/frontmatter/) or [Metalsmith](http://www.metalsmith.io). This could be used with other generators, such as [Pelican](docs.getpelican.com/en/stable/content.html), but the script would need to be changed to meet their specific format requirements.
+- Set the path to your local Hugo content store for each post type that you use. These locations are identified in strings containing `content` set in several locations in `nanopub.php`. These paths should be adjusted to the path of your Hugo content store folders, *relative to the path of your nanopub directory*. These paths are specific to your Hugo configuration and publishing structure, so you can differentiate "like" from "note" from "repost" post types if you choose. 
 
 Client Notes
 ------------
