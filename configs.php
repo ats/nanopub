@@ -21,6 +21,9 @@ return (object) array(
 	'pingMicro' => True, 							// Set to False (boolean) if you don't use micro.blog
 	'siteFeed' => 'https://prettgoodhat.com/index.xml',	// Set to your site's RSS/Atom Feed to notify micro.blog
 
+	// Config for switchboard
+	'pingSwitchboard' => False,
+
 	// Config for Weather. If you do want weather feature, set to true 
     'weatherToggle' => False,
 	'compass' => 'https://private.tracker.com/api',

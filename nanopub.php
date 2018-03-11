@@ -144,7 +144,7 @@ function indieAuth($headers)
         exit;
     } elseif ($me != $GLOBALS["siteUrl"]) {
         header("HTTP/1.1 401 Unauthorized");
-echo 'The request lacks valid authentication credentials.';
+        echo 'The request lacks valid authentication credentials\n'.$me.'\n'.$GLOBALS["siteUrl"];
 print_r($_SERVER);
         exit;
     } elseif (!in_array('create', $scopes) && !in_array('post', $scopes)) {
@@ -764,12 +764,15 @@ if (!empty($data)) {
             // ping! First one to micro.blog
             if ($configs->pingMicro) {
                 $feedArray = array ("url" => $siteFeed);
-                post_to_api("https://micro.blog/ping", "null", "$feedArray");
+                post_to_api("https://micro.blog/ping", "null", $feedArray);
             }
-            // ping! second one to switchboard
-           // $switchArray = array ("hub.mode" => "publish", "hub.url" => $siteUrl);
-           // post_to_api("https://switchboard.p3k.io/", "null", $switchArray);
-
+	    
+           // ping! second one to switchboard
+	   if ($configs->pingSwitchboard) {
+             $switchArray = array ("hub.mode" => "publish", "hub.url" => $siteUrl);
+             post_to_api("https://switchboard.p3k.io/", "null", $switchArray);
+	   }
+	    
             // ... and Setting headers, return location to client.
             header("HTTP/1.1 201 Created");
             header("Location: ". $canonical);
